@@ -16,7 +16,6 @@ const MainDashboard = () => {
     setSeed(Math.random());
   }
   const navigate = useNavigate()
-  console.log(session);
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -32,9 +31,7 @@ const MainDashboard = () => {
     checkusername()
   }
   async function checkusername(){
-    console.log('called')
     const { data, error } = await supabase.auth.getUser();
-    console.log(data.user?.user_metadata.username)
     if(data.user?.user_metadata.username === undefined){
       navigate('/addusername')
     }
@@ -55,7 +52,7 @@ const MainDashboard = () => {
       <Navbar />
       <div className="flex">
         <FriendSuggestion seed={seed} handleSeed={handleSeed} />
-        <UserLayout />
+        <UserLayout seed={seed}/>
         <Sidebar seed={seed} handleSeed={handleSeed} />
       </div>
     </Context.Provider>

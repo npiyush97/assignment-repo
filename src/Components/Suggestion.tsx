@@ -31,7 +31,6 @@ export default function FriendSuggestion({seed,handleSeed}:{seed:any,handleSeed:
     const { error } = await supabase.from("friends").insert({ id, name });
     handleSeed()
   }
-  console.log(suggestions);
   return (
     <div className="flex">
       <div

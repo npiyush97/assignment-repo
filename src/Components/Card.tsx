@@ -7,16 +7,21 @@ const Card = () => {
   const [posts, setPosts] = useState<any>([]);
   const [noPost, setNoPosts] = useState(false);
   const wrappedRef = useRef(null)
-  const { ref, inView, entry } = useInView({
-    threshold: 1,
-    onChange:(inView,entry)=>{
+  const { ref } = useInView({
+    threshold: 0.2,
+    onChange:(inView)=>{
       if(inView){
         setLimit(prev => prev + 1)
       }
     },
     delay:100
   });
+  console.log(posts)
   const fetchPosts = async () => {
+    const { data:friends, error:err } = await supabase.from("friends").select();
+    const {data:u,error:e} = await supabase.auth.getUser()
+    const friendlist = friends?.map(x => x.name)  
+    friendlist?.push(u.user?.user_metadata.username)
     const { data, error } = await supabase
       .from("posts")
       .select()
@@ -25,11 +30,11 @@ const Card = () => {
     if (error) {
       throw Error(error.message);
     }
-    console.log(limit,data)
     if (data.length === 0) {
       setNoPosts(true);
     }
-    setPosts(data);
+    let filterPost = data.filter((x:any) =>  friendlist?.includes(x?.author)).slice(0,limit)
+    setPosts(filterPost);
   };
   useEffect(() => {
     fetchPosts();

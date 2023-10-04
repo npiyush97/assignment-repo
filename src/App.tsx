@@ -21,7 +21,7 @@ function App() {
       <Route element={<Feed />} path="/newsfeed" />
       <Route element={<Registerform />} path="/register" />
       <Route element={<Loginform />} path="/login" />
-      <Route element={<UserLayout />} path="/user" />
+      {/* <Route element={<UserLayout />} path="/user" /> */}
     </Routes>
   );
 }
