@@ -1,15 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import supabase from "../Database/supabase";
+import { useInView } from "react-intersection-observer";
 
 const Card = () => {
+  const [limit, setLimit] = useState(1);
   const [posts, setPosts] = useState<any>([]);
   const [noPost, setNoPosts] = useState(false);
+  const wrappedRef = useRef(null)
+  const { ref, inView, entry } = useInView({
+    threshold: 1,
+    onChange:(inView,entry)=>{
+      if(inView){
+        setLimit(prev => prev + 1)
+      }
+    },
+    delay:100
+  });
   const fetchPosts = async () => {
-    const { data, error } = await supabase.from("posts").select();
+    const { data, error } = await supabase
+      .from("posts")
+      .select()
+      .order("created_at", { ascending: false })
+      .range(0, limit);
     if (error) {
       throw Error(error.message);
     }
-    console.log(data.length === 0)
+    console.log(limit,data)
     if (data.length === 0) {
       setNoPosts(true);
     }
@@ -17,8 +33,7 @@ const Card = () => {
   };
   useEffect(() => {
     fetchPosts();
-  }, []);
-  console.log(posts);
+  }, [limit]);
   return (
     <>
       {posts.length > 0 ? (
@@ -33,8 +48,11 @@ const Card = () => {
             author: string;
           }) => {
             return (
-              <div className=" rounded mt-2 overflow-hidden border w-full bg-white mx-3 md:mx-0 lg:mx-0">
-                <div className="w-full flex justify-between p-3">
+              <div
+                ref={wrappedRef}
+                className=" rounded mt-2 overflow-hidden border w-full bg-white mx-3 md:mx-0 lg:mx-0"
+              >
+                <div ref={ref} className="w-full flex justify-between p-3">
                   <div className="flex">
                     <div className="rounded-full h-8 w-8 bg-gray-500 flex items-center justify-center overflow-hidden">
                       <img
